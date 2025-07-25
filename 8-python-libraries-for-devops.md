@@ -9,14 +9,13 @@
 
 **Why use it:** Manage Docker containers and images programmatically.
 
-**Example:**
+**Example: With Port Mapping**
 
 ```
 import docker
-
 client = docker.from_env()
-container = client.containers.run("nginx", detach=True)
-print(f"Started container with ID: {container.id}")
+container = client.containers.run("nginx", detach=True, ports={'80/tcp': 8080})
+print(f"Started container '{container.name}' on http://localhost:8080")
 ```
 
 ---
@@ -30,13 +29,14 @@ print(f"Started container with ID: {container.id}")
 
 ```
 from kubernetes import client, config
-
 config.load_kube_config()
 v1 = client.CoreV1Api()
-
-pods = v1.list_pod_for_all_namespaces(watch=False)
-for pod in pods.items:
-    print(f"{pod.metadata.namespace} - {pod.metadata.name}")
+# Replace 'my-pod-name' and 'default' with actual values from your cluster
+try:
+    pod = v1.read_namespaced_pod(name="my-pod-name", namespace="default")
+    print(f"Pod '{pod.metadata.name}' in '{pod.metadata.namespace}' is {pod.status.phase}")
+except client.ApiException as e:
+    print(f"Error getting pod: {e.reason} (Status: {e.status})")
 ```
 
 ---
@@ -51,12 +51,21 @@ for pod in pods.items:
 ```
 import paramiko
 
+
+
 ssh = paramiko.SSHClient()
+
 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+
 ssh.connect('192.168.1.10', username='devops', password='secret')
 
+
+
 stdin, stdout, stderr = ssh.exec_command('uptime')
+
 print(stdout.read().decode())
+
+
 
 ssh.close()
 ```
@@ -73,7 +82,7 @@ ssh.close()
 import yaml
 
 with open("config.yaml") as f:
-    config = yaml.safe_load(f)
+    config = yaml.safe_load(f) # Use safe_load for security to prevent arbitrary code execution
 
 print(config["environment"])
 ```
@@ -90,7 +99,7 @@ print(config["environment"])
 ```
 import requests
 
-response = requests.get("https://httpbin.org/get")
+response = requests.get("https://package.org/get")
 print(response.json())
 ```
 
@@ -103,13 +112,13 @@ print(response.json())
 **Example:**
 
 ```
-def test_add():
-    assert 1 + 1 == 2
+def test_multiply():
+    assert 3 * 3 == 9
 ```
 
 Run test:
 
-`pytest test_script.py`
+`pytest testFile.py`
 
 ---
 
